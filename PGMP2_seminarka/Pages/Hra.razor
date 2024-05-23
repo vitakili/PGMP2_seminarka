@@ -1,4 +1,6 @@
 ﻿@page "/hra"
+@using PGMP2_seminarka.Models
+@inject IJSRuntime JSRuntime
 
 <div class="cointainer">
    <div class="card">
@@ -14,19 +16,31 @@
     <div class="herni-plocha">
         @foreach (var postava in postavy)
         {
-            <div class="postava
-        @(postava.JeNaLodi ? "postava-na-lodi" : "")
-        @(postava.Breh == "pravý" ? "postava-na-pravem-brehu" : "postava-na-levem-brehu")"
+            <div class="postava"
                  style="@postava.Style"
-                 @onclick="() => PresunNaLod(postava)">
-                <img src="@postava.CestaObrazku" alt="@postava.Jmeno" />
-                <p>@postava.Jmeno</p>
+                 @onclick="() => {if(!konecHry) PresunNaLod(postava);}"
+            >
+                <img src="@postava.CestaObrazku" alt="@postava.Jmeno" style="transform: scaleX(@(postava.Breh == Breh.Pravy ? "1" : "-1"))" />
+                <p>@GetCeskeJmeno(postava.Jmeno)</p>
             </div>
         }
-        <img class="lod" src="../img/lod.png" alt="Loď" style="left: @(lod.Breh == "pravý" ? "500px" : "310px")" @onclick="VyplutLodi" />
+        <img class="lod" src="../img/lod.png" alt="Loď" 
+            style="left: @(lod.Breh == Breh.Pravy ? "600px" : "310px"); @lod.Style"
+             @onclick="() => {if (!konecHry) VyplutLodi();}" />
+        @if (!string.IsNullOrEmpty(zprava) || konecHry)
+        {
         <div class="card zprava">
-            <p>@zprava</p>
+                @if(konecHry)
+                {
+                    <h3 class="@(vyhra ? "text-success" : "text-danger")">@konecnaHlaska</h3>
+                    <button onclick="location.reload()" class="btn btn-warning">Začít znovu</button>
+                }
+                else
+                {
+                    <p>@zprava</p>
+                }
         </div>
+        }
     </div>
 
     <div class="background"></div>

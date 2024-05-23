@@ -4,7 +4,8 @@
     {
         public int KapacitaLodi { get; set; }
         public List<Postava> PostavyNaLodi { get; set; } = new List<Postava>();
-        public string Breh { get; set; } = "levý";
+        public Breh Breh { get; set; } = Breh.Levy;
+        public string Style { get; set; } = "";
 
         public bool JePlna()
         {
@@ -13,7 +14,7 @@
 
         public bool JePrevoznikNaLodi()
         {
-            return PostavyNaLodi.Any(p => p.Jmeno == "Převozník");
+            return PostavyNaLodi.Any(p => p.Jmeno == JmenoPostavy.Prevoznik);
         }
 
     }

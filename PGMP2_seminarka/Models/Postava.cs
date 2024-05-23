@@ -2,14 +2,14 @@
 {
     public class Postava
     {
-        public string Jmeno { get; set; }
+        public JmenoPostavy Jmeno { get; set; }
         public string CestaObrazku { get; set; }
         public bool JeNaLodi { get; set; }
-        public string Breh { get; set; }
+        public Breh Breh { get; set; }
 
         public string Style { get; set; } = "";
 
-        public Postava(string jmeno, string cestaObrazku, bool jeNaLodi, string breh)
+        public Postava(JmenoPostavy jmeno, string cestaObrazku, bool jeNaLodi, Breh breh)
         {
             Jmeno = jmeno;
             CestaObrazku = cestaObrazku;
