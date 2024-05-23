@@ -1,0 +1,36 @@
+﻿@page "/hra"
+
+<div class="cointainer">
+   <div class="card">
+    <div class="card-header">
+         <h4 class="card-title">
+             Zelí, koza, vlk
+         </h4>
+         <p>
+                Převozník chce převézt z jednoho břehu na druhý <strong>velkou hlávku zelí, kozu a vlka</strong>. Do loďky s sebou může vzít buď zelí, nebo kozu, nebo vlka, ale víc se tam nevejde. Nechá-li na břehu hlávku zelí a kozu, koza zelí sežere. Nechá-li na břehu kozu a vlka, pak vlk sežere kozu. Přijdete na to, jak tedy převozník tuto situaci vyřeší?
+         </p>
+     </div>
+   </div>
+    <div class="herni-plocha">
+        @foreach (var postava in postavy)
+        {
+            <div class="postava
+        @(postava.JeNaLodi ? "postava-na-lodi" : "")
+        @(postava.Breh == "pravý" ? "postava-na-pravem-brehu" : "postava-na-levem-brehu")"
+                 style="@postava.Style"
+                 @onclick="() => PresunNaLod(postava)">
+                <img src="@postava.CestaObrazku" alt="@postava.Jmeno" />
+                <p>@postava.Jmeno</p>
+            </div>
+        }
+        <img class="lod" src="../img/lod.png" alt="Loď" style="left: @(lod.Breh == "pravý" ? "500px" : "310px")" @onclick="VyplutLodi" />
+        <div class="card zprava">
+            <p>@zprava</p>
+        </div>
+    </div>
+
+    <div class="background"></div>
+</div>
+@code {
+
+}
