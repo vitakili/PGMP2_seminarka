@@ -62,6 +62,9 @@
     width: 190px;
     transform: scaleX(-1);
 }
+.lod:hover {
+    cursor:pointer;
+}
 
 .zprava {
     position: absolute;
