@@ -26,7 +26,7 @@
         }
         <img class="lod" src="../img/lod.png" alt="Loď" 
             style="left: @(lod.Breh == Breh.Pravy ? "600px" : "310px"); @lod.Style"
-             @onclick="() => {if (!konecHry) VyplutLodi();}" />
+             @onclick="() => {if (!konecHry) VyploutLodi();}" />
         @if (!string.IsNullOrEmpty(zprava) || konecHry)
         {
         <div class="card zprava">
@@ -42,7 +42,23 @@
         </div>
         }
     </div>
-
+    <div class="card" style="position: absolute; bottom: 0; right: 0">
+        <div class="card-header">
+            <h3>Stavový diagram</h3>
+        </div>
+        <div class="card-body">
+            <div class="list-group">
+                @foreach (var stav in stavy)
+                {
+                    <div class="list-group-item @(stav == AktualniStav ? "aktualni-stav" : "")">
+                        <p class="mb-1">Levý břeh: @string.Join(", ", stav.PostavyNaLevemBrehu.Select(p => GetCeskeJmeno(p)))</p>
+                        <p class="mb-1">Pravý břeh: @string.Join(", ", stav.PostavyNaPravemBrehu.Select(p => GetCeskeJmeno(p)))</p>
+                        <p class="mb-1">Loď: @(stav.LodJeNaPravemBrehu ? "Pravý břeh" : "Levý břeh")</p>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
     <div class="background"></div>
 </div>
 @code {

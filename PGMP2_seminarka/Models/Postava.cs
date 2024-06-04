@@ -17,9 +17,5 @@
             Breh = breh;
         }
 
-        public bool JeNaStejnemMiste(Postava jinaPostava)
-        {
-            return this.Breh == jinaPostava.Breh;
-        }
     }
 }

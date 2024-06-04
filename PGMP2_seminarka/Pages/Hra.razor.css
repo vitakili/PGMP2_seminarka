@@ -17,7 +17,7 @@
 }
 
 .postava-na-lodi {
-    transform: translate(100px, -10px); /* Změne podle potřeby */
+    transform: translate(100px, -10px);
 }
 
 
@@ -74,4 +74,16 @@
     z-index: 100;
     text-align:center;
     padding: 6px 12px;
+}
+
+.spravny-stav {
+    background-color: green;
+}
+
+.spatny-stav {
+    background-color: red;
+}
+
+.aktualni-stav {
+    border: solid 2px green;
 }

@@ -19,6 +19,8 @@ namespace PGMP2_seminarka.Pages
         };
 
         Lod lod = new Lod { KapacitaLodi = 2 };
+        List<Stav> stavy = new List<Stav>();
+        Stav AktualniStav { get; set; }
 
         bool konecHry = false;
         bool vyhra = false;
@@ -26,21 +28,33 @@ namespace PGMP2_seminarka.Pages
         protected override void OnInitialized()
         {
             base.OnInitialized();
+
             // Nastaví základní styl pro všechny postavy
             for (int i = 0; i < postavy.Count; i++)
             {
                 NastavStylPostavy(postavy[i], i);
             }
+
+            // Inicializujte seznam stavů s počátečním stavem, kde jsou všechny postavy na levém břehu.
+            stavy = new List<Stav>
+                {
+                    new Stav
+                    {
+                        PostavyNaLevemBrehu = postavy.Select(p => p.Jmeno).ToList(),
+                        PostavyNaPravemBrehu = new List<JmenoPostavy>(),
+                        LodJeNaPravemBrehu = false
+                    }
+                };
+            AktualniStav = stavy.First();
         }
+
         void AktualizovatHru()
         {
-            // Nastaví styl pro všechny postavy
             for (int i = 0; i < postavy.Count; i++)
             {
                 NastavStylPostavy(postavy[i], i);
             }
 
-            // Zkontroluje, zda na stejném břehu zůstal vlk s kozou a zda převozník není na stejném břehu
             var postavyNaLevemBrehu = postavy.Where(p => p.Breh == Breh.Levy).ToList();
             var postavyNaPravemBrehu = postavy.Where(p => p.Breh == Breh.Pravy).ToList();
 
@@ -51,7 +65,6 @@ namespace PGMP2_seminarka.Pages
                 konecHry = true;
             }
 
-            // Zkontroluje, zda na stejném břehu zůstala koza se zelím a zda převozník není na stejném břehu
             if ((postavyNaLevemBrehu.Any(p => p.Jmeno == JmenoPostavy.Koza) && postavyNaLevemBrehu.Any(p => p.Jmeno == JmenoPostavy.Zeli) && !postavyNaLevemBrehu.Any(p => p.Jmeno == JmenoPostavy.Prevoznik)) ||
                 (postavyNaPravemBrehu.Any(p => p.Jmeno == JmenoPostavy.Koza) && postavyNaPravemBrehu.Any(p => p.Jmeno == JmenoPostavy.Zeli) && !postavyNaPravemBrehu.Any(p => p.Jmeno == JmenoPostavy.Prevoznik)))
             {
@@ -59,7 +72,6 @@ namespace PGMP2_seminarka.Pages
                 konecHry = true;
             }
 
-            // Zkontroluje, zda jsou všechny postavy na pravém břehu a uživatel vyhrál
             if (postavy.All(p => p.Breh == Breh.Pravy) && postavy.All(p => !p.JeNaLodi))
             {
                 konecnaHlaska = "Gratulujeme, vyhrál jste!";
@@ -70,11 +82,10 @@ namespace PGMP2_seminarka.Pages
             {
                 Task.Run(async () =>
                 {
-                    await Task.Delay(1000); // čeká 1 sekundu, aby doběhly animace
+                    await Task.Delay(1000);
                     await RestartovatHru();
                 });
             }
-
         }
 
         async Task RestartovatHru()
@@ -103,6 +114,14 @@ namespace PGMP2_seminarka.Pages
                 // Pokud je postava již na lodi, odstraní ji z lodi
                 postava.JeNaLodi = false;
                 lod.PostavyNaLodi.Remove(postava);
+
+                // Pokud je loď na opačném břehu, změníme stav
+                if ((lod.Breh == Breh.Levy && AktualniStav.PostavyNaPravemBrehu.Contains(postava.Jmeno)) ||
+                    (lod.Breh == Breh.Pravy && AktualniStav.PostavyNaLevemBrehu.Contains(postava.Jmeno)))
+                {
+                    postava.Breh = lod.Breh;
+                    ZmenitStav(postava);
+                }
             }
             else if (lod.PostavyNaLodi.Count < lod.KapacitaLodi && postava.Breh == lod.Breh)
             {
@@ -114,10 +133,40 @@ namespace PGMP2_seminarka.Pages
             {
                 zprava = "Loď je plná nebo postava je na opačném břehu!";
             }
-            AktualizovatHru();
 
+            AktualizovatHru();
         }
-        void VyplutLodi()
+
+        void ZmenitStav(Postava postava)
+        {
+            if (AktualniStav != null)
+            {
+                var novyStav = new Stav
+                {
+                    PostavyNaLevemBrehu = new List<JmenoPostavy>(AktualniStav.PostavyNaLevemBrehu),
+                    PostavyNaPravemBrehu = new List<JmenoPostavy>(AktualniStav.PostavyNaPravemBrehu),
+                    LodJeNaPravemBrehu = lod.Breh == Breh.Pravy ? true : false
+                };
+
+                if (postava.Breh == Breh.Levy)
+                {
+                    novyStav.PostavyNaPravemBrehu.Remove(postava.Jmeno);
+                    novyStav.PostavyNaLevemBrehu.Add(postava.Jmeno);
+                }
+                else
+                {
+                    novyStav.PostavyNaLevemBrehu.Remove(postava.Jmeno);
+                    novyStav.PostavyNaPravemBrehu.Add(postava.Jmeno);
+                }
+
+                // Přidejte nový stav do seznamu stavů.
+                stavy.Add(novyStav);
+
+                // Nastavte nový stav jako aktuální stav.
+                AktualniStav = novyStav;
+            }
+        }
+       private void VyploutLodi()
         {
             if (lod.JePrevoznikNaLodi())
             {
@@ -147,6 +196,7 @@ namespace PGMP2_seminarka.Pages
             {
                 zprava = "Na lodi musí být převozník, aby mohla vyplout!";
             }
+
             AktualizovatHru();
         }
         public string GetCeskeJmeno(JmenoPostavy jmeno)
